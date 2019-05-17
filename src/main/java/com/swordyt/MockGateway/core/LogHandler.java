@@ -4,16 +4,26 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
+import lombok.Data;
+
 /**
  * @author 作者 swordyt@163.com:
  * @version 创建时间：2019年5月7日 下午5:40:37
  */
+@Data
 public class LogHandler {
 	private String url;
-	
-	public LogHandler(String rule,String url) {
+	private Boolean isSuccess;
+	private String message;
+
+	public void result(Boolean isSuccess, String message) {
+		this.isSuccess = isSuccess;
+		this.message = message;
+	}
+
+	public LogHandler(String rule, String url) {
 		this.rule = rule;
-		this.url=url;
+		this.url = url;
 	}
 
 	@Override
@@ -22,7 +32,7 @@ public class LogHandler {
 		for (int num = 0; num < stepStack.size(); num++) {
 			stepResult += stepStack.get(num).toString() + "\r\n";
 		}
-		return "Url:"+this.url+",Rule:" + this.rule + "\r\n" + "Result:\r\n" + stepResult;
+		return "Url:" + this.url + ",Rule:" + this.rule + "\r\n" + "Result:\r\n" + stepResult;
 	}
 
 	private String rule;
@@ -33,6 +43,7 @@ public class LogHandler {
 		stepStack.add(new Step(operation, result, input, actual));
 	}
 
+	@Data
 	private class Step {
 		private String operation;// 预算操作
 		private Boolean result;// 比较结果

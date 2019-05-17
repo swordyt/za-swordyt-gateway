@@ -25,14 +25,6 @@ public class MockGatewayApplication implements ApplicationContextAware{
 //		Request request=new Request(null,null,null);
 //		request.type().equalTo("GET").forward("https://www.cnblogs.com");
 	}
-//	@Bean
-//	public ServletRegistrationBean registrationBean() {
-//		ServletRegistrationBean registrationBean = new ServletRegistrationBean(new ProxyServlet(this.applicationContext),"/*");
-//		Map<String, String> params = ImmutableMap.of("targetUri", "https://mbd.baidu.com/newspage/data/landingsuper?context=%7B%22nid%22%3A%22news_8882937857693590195%22%7D&n_type=0&p_from=1", "log", "true");
-//		registrationBean.setInitParameters(params);
-//		registrationBean.setOrder(3);
-//		return registrationBean;
-//	}
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 			this.applicationContext=applicationContext;

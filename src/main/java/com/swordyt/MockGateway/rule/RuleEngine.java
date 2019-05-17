@@ -26,17 +26,18 @@ public class RuleEngine{
 	private HttpServletResponse servletResponse;
 	private String url;
 	private ApplicationContext applicationContext;
-
+	private List<LogHandler> logs;
 	public RuleEngine(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
-			ApplicationContext applicationContext) {
+			ApplicationContext applicationContext,List<LogHandler> logs) {
 		this.servletRequest = servletRequest;
 		this.servletResponse = servletResponse;
 		this.url = servletRequest.getRequestURI();
 		this.applicationContext = applicationContext;
+		this.logs=logs;
 	}
 
 	public String start() {
-		System.out.println("规则开始匹配："+this.servletRequest.getRequestURI());
+		System.out.println("规则开始匹配：" + this.servletRequest.getRequestURI());
 		// 规则查询
 		List<String> rules = RulePool.getRule(this.servletRequest.getServerPort(), this.servletRequest.getRequestURI());
 		if (rules == null || rules.isEmpty()) {
@@ -46,21 +47,27 @@ public class RuleEngine{
 		// 规则执行
 
 		// 无规则匹配成功
-//		String ruleScript = this.applicationContext.getEnvironment().getProperty("NYDD.rule.script");
 		String domain = null;
 		for (String rule : rules) {
-			LogHandler log = new LogHandler(rule,this.servletRequest.getRequestURI());
+			LogHandler log = new LogHandler(rule, this.servletRequest.getRequestURI());
+			this.logs.add(log);// 记录所有规则日志
 			OperationUtensil operation = new OperationUtensil();
 			if (rule == null || !rule.startsWith("request.")) {
-				System.out.println("规则错误，未以request.开头：" + rule + ",跳过");
+				String message = "规则错误，未以request.开头：" + rule + ",跳过";
+				System.out.println(message);
+				log.result(false, message);
 			}
 			try {
-				domain = this.runRule(rule,log,operation);
+				domain = this.runRule(rule, log, operation);
 				if (StringUtils.isNotBlank(domain)) {
+					log.result(true, null);
 					break;
 				}
+				log.result(false, null);
 			} catch (Exception e) {
-				System.out.println("规则异常:" + JSON.toJSONString(e.getStackTrace()) + ",规则：" + rule + ",跳过");
+				String message="规则异常:" + JSON.toJSONString(e.getStackTrace()) + ",规则：" + rule + ",跳过";
+				System.out.println(message);
+				log.result(false, message);
 			}
 		}
 		return domain;

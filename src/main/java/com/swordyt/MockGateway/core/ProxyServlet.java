@@ -88,7 +88,7 @@ public class ProxyServlet extends HttpServlet {
 			builder.append(new String(buf));
 		}
 		System.out.println(builder.toString());
-		RuleEngine engine = new RuleEngine(servletRequest, servletResponse, this.applicationContext);
+		RuleEngine engine = new RuleEngine(servletRequest, servletResponse, this.applicationContext,null);
 		String targetDomain = engine.start();
 		if (StringUtils.isBlank(targetDomain)) {
 			targetDomain = "https://www.baidu.com";
