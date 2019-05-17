@@ -21,19 +21,20 @@ import com.swordyt.MockGateway.core.RulePool;
  * @author 作者 swordyt@163.com:
  * @version 创建时间：2019年5月7日 下午6:54:22
  */
-public class RuleEngine{
+public class RuleEngine {
 	private HttpServletRequest servletRequest;
 	private HttpServletResponse servletResponse;
 	private String url;
 	private ApplicationContext applicationContext;
 	private List<LogHandler> logs;
+
 	public RuleEngine(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
-			ApplicationContext applicationContext,List<LogHandler> logs) {
+			ApplicationContext applicationContext, List<LogHandler> logs) {
 		this.servletRequest = servletRequest;
 		this.servletResponse = servletResponse;
 		this.url = servletRequest.getRequestURI();
 		this.applicationContext = applicationContext;
-		this.logs=logs;
+		this.logs = logs;
 	}
 
 	public String start() {
@@ -65,41 +66,30 @@ public class RuleEngine{
 				}
 				log.result(false, null);
 			} catch (Exception e) {
-				String message="规则异常:" + JSON.toJSONString(e.getStackTrace()) + ",规则：" + rule + ",跳过";
+				String message = "规则异常:" + JSON.toJSONString(e.getStackTrace()) + ",规则：" + rule + ",跳过";
 				System.out.println(message);
 				log.result(false, message);
 			}
 		}
 		return domain;
 	}
-	private String runRule(String ruleScript,LogHandler log,OperationUtensil operation) throws Exception {
+
+	private String runRule(String ruleScript, LogHandler log, OperationUtensil operation) throws Exception {
 		ScriptEngineManager factory = new ScriptEngineManager();
 		// 每次生成一个engine实例
 		ScriptEngine engine = factory.getEngineByName("groovy");
 		System.out.println(engine.toString());
 		assert engine != null;
 		// javax.script.Bindings
-				Bindings binding = engine.createBindings();
+		Bindings binding = engine.createBindings();
 		binding.put("request", new Request(servletRequest, log, operation));
 		// 如果script文本来自文件,请首先获取文件内容
-//				try {
-					engine.eval("	  def exeRule(){\r\n" + "	  try {\r\n" + "			return " + ruleScript + ";\r\n"
-							+ "	  } catch(Exception ex) {\r\n" + "	ex.printStackTrace();\r\n" + "        return null;\r\n"
-							+ "      }}", binding);
-//				} catch (ScriptException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				String domain = (String) ((Invocable) engine).invokeFunction("exeRule", null);
-//				} catch (NoSuchMethodException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (ScriptException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				System.out.println("执行结果日志："+log.toString());
-				return domain;
+		engine.eval("	  def exeRule(){\r\n" + "	  try {\r\n" + "			return " + ruleScript + ";\r\n"
+				+ "	  } catch(Exception ex) {\r\n" + "	ex.printStackTrace();\r\n" + "        return null;\r\n"
+				+ "      }}", binding);
+		Object result = ((Invocable) engine).invokeFunction("exeRule", null);
+		System.out.println("执行结果日志：" + log.toString());
+		return result instanceof String ? result.toString() : null;
 	}
-	
+
 }
