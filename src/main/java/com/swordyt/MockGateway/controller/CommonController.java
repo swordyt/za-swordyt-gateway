@@ -33,7 +33,7 @@ public class CommonController implements ApplicationContextAware {
 	ApplicationContext applicationContext;
 //	private final static String TARGET_DOMAIN = "https://www.baidu.com";
 	private final static String URL_PREFIX = "/e10adc3949ba59abbe56e057f20f883e";
-	private final static String IS_TRYRUN =  "e10adc3949ba59abbe56e057f20f883e";
+	private final static String IS_TRYRUN = "e10adc3949ba59abbe56e057f20f883e";
 
 	@PostMapping(URL_PREFIX + "/rule/save")
 	public ResultModel saveRule(HttpServletRequest request, @RequestBody SaveRuleReq req) {
@@ -76,7 +76,7 @@ public class CommonController implements ApplicationContextAware {
 			servletResponse.setStatus(200);
 			return;
 		}
-
+		//规则匹配失败返回404页面
 		if (StringUtils.isBlank(targetDomain)) {
 			servletRequest.getRequestDispatcher("/error").forward(servletRequest, servletResponse);
 			return;
